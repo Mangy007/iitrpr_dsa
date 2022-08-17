@@ -1,4 +1,4 @@
 typedef struct Node {
-    int data;
+    int value;
     struct Node * next;
 } Node;
