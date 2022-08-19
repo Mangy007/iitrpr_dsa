@@ -1,6 +1,6 @@
 # igonore files
 assignment1/A01_Kumar_2022AIM1002_22MCS506.c
 assignment1/R01_Kumar_2022AIM1002_22MCS506.pdf
-assignment1/sort.out
 assignment1/sortTime.csv
+*/*.out
 
