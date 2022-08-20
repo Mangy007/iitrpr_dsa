@@ -2,12 +2,44 @@
 #include<stdlib.h>
 #include "Node.c"
 
+void insertAtEnd(int val);
+Node * insertAtBeginning(int val);
+void deleteLastNode();
+void deleteFirstNode();
+void deleteSpecifiNode(int val);
+void findNode(int val);
+void printList();
+void size();
+void performOperationsBasedOnInput(int choice);
 
-void insertAtEnd(Node *node, int data) {
+Node *head = NULL;
+
+int main() {
+
+	int testCases;
+	scanf("%d", &testCases);
+	while(testCases--) {
+
+		int entries;
+		scanf("%d", &entries);
+		head = NULL;//(Node*) malloc(sizeof(Node));
+		while (entries--)
+		{
+			int choice;
+			scanf("%d",&choice);
+			performOperationsBasedOnInput(choice);
+		}
+	}
+	return 0;
+}
+
+
+void insertAtEnd(int val) {
 
     Node *newNode = (Node *) malloc(sizeof(Node));
-    newNode -> value = data;
+    newNode -> value = val;
     newNode -> next = NULL;
+	Node *node = head;
 
     if(node == NULL) node = newNode;
     else {
@@ -16,18 +48,83 @@ void insertAtEnd(Node *node, int data) {
 	}
 }
 
-Node * insertAtBeginning(Node *node, int data) {
+Node * insertAtBeginning(int val) {
 
-    Node *newNode = (Node *) malloc(sizeof(Node));
-    newNode -> value = data;
-    newNode -> next = node;
+    Node *node = (Node *) malloc(sizeof(Node));
+    node -> value = val;
+    node -> next = head;
 
-    return newNode;
+    return node;
 }
 
-void printList(Node *node) {
+void deleteLastNode() {
+
+	if (head==NULL) {
+		printf("\nNo node to delete");
+		return;
+	}
+	if (head->next==NULL) {
+		free(head);
+		head = NULL;
+		return;
+	}
+	Node *node = head;
+	while (node->next->next) {
+		node = node->next;
+	}
+	free(node->next);
+	node->next = NULL;
+}
+
+void deleteFirstNode() {
+	
+	if (head==NULL) {
+		printf("\nNo node to delete");
+		return;
+	}
+	if (head->next==NULL) {
+		free(head);
+		head = NULL;
+		return;
+	}
+	Node *node = head;
+	head = head->next;
+	free(node);
+}
+
+void deleteSpecifiNode(int val) {
+
+	if (head==NULL) {
+		printf("\nNo node to delete");
+		return;
+	}
+
+}
+
+void findNode(int val) {
+
+	if (head==NULL) {
+		printf("\nList is empty");
+		return;
+	}
+	
+}
+
+void size() {
     
-    printf("\n");
+	Node *node = head;
+	int counter = 0;
+    while(node!=NULL) {
+        counter++;
+        node = node->next;
+    }
+	printf("\n%d", counter);
+}
+
+void printList() {
+    
+	printf("\n");
+	Node *node = head;
     while(node!=NULL) {
         if(node->next)
             printf("%d-->",node->value);
@@ -35,58 +132,76 @@ void printList(Node *node) {
             printf("%d",node->value);
         node = node->next;
     }
+	printf("\n");
 }
 
-int main() {
+void performOperationsBasedOnInput(int choice) {
 
-    Node *head = NULL;//(Node*) malloc(sizeof(Node));
-	int choice;
-	printf("Enter the choice: ");
-	scanf("%d",&choice);
-	while(choice) {
-	    switch(choice) {
-	        
-	        case 1: {
-	            printf("Enter the data value: ");
-	            insertAtBeginning()
-	            break;}
-	        case 2: break;
-	        case 3: break;
-	        case 4: break;
-	        case 5: break;
-	        case 6: break;
-	        case 7: break;
-	        case 8: break;
-	        default: { 
-	            printf("“Wrong Input. \nEnter your choice again:")
-	            scanf("%d", &choice);
-	            break;
-	        }
-	    }
-	}
-	while(N-- > 0) {
-		int val;
-		scanf("%d", &val);
-		if(head==NULL) {
-		    head = (Node*) malloc(sizeof(Node));
-			head->value = val;
-			head->next = NULL;
+	switch(choice) {
+		case 1: {
+			// insert at beginning
+			int val;
+			scanf("%d", &val);
+			if(head==NULL) {
+				head = (Node*) malloc(sizeof(Node));
+				head->value = val;
+				head->next = NULL;
+			}
+			else {
+				head = insertAtBeginning(val);
+			}
+			break;
 		}
-		else {
-			insertAtEnd(head, val);
+		case 2: {
+			// insert at end
+			int val;
+			scanf("%d", &val);
+			if(head==NULL) {
+				head = (Node*) malloc(sizeof(Node));
+				head->value = val;
+				head->next = NULL;
+			}
+			else {
+				insertAtEnd(val);
+			}
+			break;
+		}
+		case 3: {
+			// delete first node
+			deleteFirstNode();
+			break;
+		}
+		case 4: {
+			// delete last node
+			deleteLastNode();
+			break;
+		}
+		case 5: {
+			// ask for input
+			// delete specific node
+			int val;
+			scanf("%d", &val);
+			deleteSpecifiNode(val);
+			break;
+		}
+		case 6: {
+			// ask for input
+			// find node
+			break;
+		}
+		case 7: {
+			// print size
+			size();
+			break;
+		}
+		case 8:{
+			// print list
+			printList();
+			break;
+		}
+		default: { 
+			printf("“Wrong Input. \nEnter your choice again: ");
+			break;
 		}
 	}
-	
-    // Node *temp = head;
-    printList(head);
-//     while(temp!=NULL) {
-//         printf("%d-->",temp->value);
-// 		// printf(temp->value);
-//         temp = temp->next;
-//     }
-    head = insertAtBeginning(head, 100);
-    head = insertAtBeginning(head, 101);
-    printList(head);
-
-    return 0;
 }
