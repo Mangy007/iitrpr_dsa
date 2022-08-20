@@ -2,11 +2,11 @@
 #include<stdlib.h>
 #include "Node.c"
 
+void insertAtBeginning(int val);
 void insertAtEnd(int val);
-Node * insertAtBeginning(int val);
-void deleteLastNode();
 void deleteFirstNode();
-void deleteSpecifiNode(int val);
+void deleteLastNode();
+void deleteSpecificNode(int val);
 void findNode(int val);
 void printList();
 void size();
@@ -30,9 +30,18 @@ int main() {
 			performOperationsBasedOnInput(choice);
 		}
 	}
+	printf("\n");
 	return 0;
 }
 
+void insertAtBeginning(int val) {
+
+    Node *node = (Node *) malloc(sizeof(Node));
+    node -> value = val;
+    node -> next = head;
+
+	head = node;
+}
 
 void insertAtEnd(int val) {
 
@@ -48,13 +57,20 @@ void insertAtEnd(int val) {
 	}
 }
 
-Node * insertAtBeginning(int val) {
-
-    Node *node = (Node *) malloc(sizeof(Node));
-    node -> value = val;
-    node -> next = head;
-
-    return node;
+void deleteFirstNode() {
+	
+	if (head==NULL) {
+		printf("\nNo node to delete");
+		return;
+	}
+	if (head->next==NULL) {
+		free(head);
+		head = NULL;
+		return;
+	}
+	Node *node = head;
+	head = head->next;
+	free(node);
 }
 
 void deleteLastNode() {
@@ -76,29 +92,42 @@ void deleteLastNode() {
 	node->next = NULL;
 }
 
-void deleteFirstNode() {
-	
+void deleteSpecificNode(int val) {
+
 	if (head==NULL) {
 		printf("\nNo node to delete");
 		return;
 	}
+	// when only one node is present
 	if (head->next==NULL) {
-		free(head);
-		head = NULL;
+		if(head->value==val) {
+			free(head);
+			head = NULL;
+			return;
+		}
+		printf("\nNode not present");
 		return;
 	}
 	Node *node = head;
-	head = head->next;
-	free(node);
-}
-
-void deleteSpecifiNode(int val) {
-
-	if (head==NULL) {
-		printf("\nNo node to delete");
+	// when the node to be find is the first node
+	if(node->value==val) {
+		head = head->next;
+		free(node);
 		return;
 	}
 
+	// finding the node in intermediate
+	while (node->next->next) {
+		if(node->next->value==val) break;
+		node = node->next;
+	}
+	if(node->next->value==val) {
+		Node *temp = node->next;
+		node->next = node->next->next;
+		free(temp);
+		return;
+	}
+	printf("\nNode not present");
 }
 
 void findNode(int val) {
@@ -107,6 +136,24 @@ void findNode(int val) {
 		printf("\nList is empty");
 		return;
 	}
+	int i=1;
+	int *headAddress = &(head->value);
+	Node *node = head;
+	while (node->next) {
+		if (node->value==val) break;
+		node = node->next;
+		i++;
+	}
+	
+	if (node->value==val) {
+		int *nodeAddress = &(node->value);
+		int diff = (headAddress>nodeAddress)?(headAddress-nodeAddress)/sizeof(int):(nodeAddress-headAddress)/sizeof(int);
+		printf("\n%d %d", i, diff);
+	}
+	else {
+		printf("\nNode not present");
+	}
+	
 	
 }
 
@@ -148,7 +195,7 @@ void performOperationsBasedOnInput(int choice) {
 				head->next = NULL;
 			}
 			else {
-				head = insertAtBeginning(val);
+				insertAtBeginning(val);
 			}
 			break;
 		}
@@ -177,16 +224,17 @@ void performOperationsBasedOnInput(int choice) {
 			break;
 		}
 		case 5: {
-			// ask for input
 			// delete specific node
 			int val;
 			scanf("%d", &val);
-			deleteSpecifiNode(val);
+			deleteSpecificNode(val);
 			break;
 		}
 		case 6: {
-			// ask for input
-			// find node
+			// find node position and address difference from head in units
+			int val;
+			scanf("%d", &val);
+			findNode(val);
 			break;
 		}
 		case 7: {
