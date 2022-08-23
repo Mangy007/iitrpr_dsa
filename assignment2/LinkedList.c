@@ -116,7 +116,7 @@ void deleteSpecificNode(int val) {
 		return;
 	}
 
-	// finding the node in intermediate
+	// finding and deleting the node in intermediate
 	while (node->next->next) {
 		if(node->next->value==val) break;
 		node = node->next;
@@ -137,24 +137,24 @@ void findNode(int val) {
 		return;
 	}
 	int i=1;
-	int *headAddress = &(head->value);
+	Node *headAddress = head;
 	Node *node = head;
 	while (node->next) {
 		if (node->value==val) break;
 		node = node->next;
 		i++;
 	}
-	
+
 	if (node->value==val) {
-		int *nodeAddress = &(node->value);
-		int diff = (headAddress>nodeAddress)?(headAddress-nodeAddress)/sizeof(int):(nodeAddress-headAddress)/sizeof(int);
+		Node *nodeAddress = node;
+		printf("\nnode  size: %ld", sizeof(Node));
+		printf("\nhead: %ld node: %ld", headAddress, nodeAddress);
+		int diff = headAddress-nodeAddress;
 		printf("\n%d %d", i, diff);
 	}
 	else {
 		printf("\nNode not present");
 	}
-	
-	
 }
 
 void size() {
@@ -248,7 +248,7 @@ void performOperationsBasedOnInput(int choice) {
 			break;
 		}
 		default: { 
-			printf("“Wrong Input. \nEnter your choice again: ");
+			printf("Wrong Input. \nEnter your choice again: ");
 			break;
 		}
 	}
