@@ -18,11 +18,13 @@ int main() {
 
 	int testCases;
 	scanf("%d", &testCases);
+	int currentTestcase = 1;
 	while(testCases--) {
 
 		int entries;
 		scanf("%d", &entries);
 		head = NULL;//(Node*) malloc(sizeof(Node));
+		printf("\n#%d", currentTestcase++);
 		while (entries--)
 		{
 			int choice;
@@ -60,7 +62,7 @@ void insertAtEnd(int val) {
 void deleteFirstNode() {
 	
 	if (head==NULL) {
-		printf("\nNo node to delete");
+		printf(" E");
 		return;
 	}
 	if (head->next==NULL) {
@@ -76,7 +78,7 @@ void deleteFirstNode() {
 void deleteLastNode() {
 
 	if (head==NULL) {
-		printf("\nNo node to delete");
+		printf(" E");
 		return;
 	}
 	if (head->next==NULL) {
@@ -95,7 +97,7 @@ void deleteLastNode() {
 void deleteSpecificNode(int val) {
 
 	if (head==NULL) {
-		printf("\nNo node to delete");
+		printf(" E");
 		return;
 	}
 	// when only one node is present
@@ -105,7 +107,7 @@ void deleteSpecificNode(int val) {
 			head = NULL;
 			return;
 		}
-		printf("\nNode not present");
+		printf(" N");
 		return;
 	}
 	Node *node = head;
@@ -127,13 +129,13 @@ void deleteSpecificNode(int val) {
 		free(temp);
 		return;
 	}
-	printf("\nNode not present");
+	printf(" N");
 }
 
 void findNode(int val) {
 
 	if (head==NULL) {
-		printf("\nList is empty");
+		printf(" E");
 		return;
 	}
 	int i=1;
@@ -147,13 +149,13 @@ void findNode(int val) {
 
 	if (node->value==val) {
 		Node *nodeAddress = node;
-		printf("\nnode  size: %ld", sizeof(Node));
-		printf("\nhead: %ld node: %ld", headAddress, nodeAddress);
+//		printf("\nnode  size: %ld", sizeof(Node));
+//		printf("\nhead: %ld node: %ld", headAddress, nodeAddress);
 		int diff = headAddress-nodeAddress;
-		printf("\n%d %d", i, diff);
+		printf(" %d(%d)", i, diff);
 	}
 	else {
-		printf("\nNode not present");
+		printf(" N");
 	}
 }
 
@@ -165,21 +167,25 @@ void size() {
         counter++;
         node = node->next;
     }
-	printf("\n%d", counter);
+	printf(" %d", counter);
 }
 
 void printList() {
     
-	printf("\n");
+	if(head==NULL) {
+		printf(" E");
+		return;
+	}
+	printf(" [");
 	Node *node = head;
     while(node!=NULL) {
         if(node->next)
-            printf("%d-->",node->value);
+            printf("%d-",node->value);
         else
             printf("%d",node->value);
         node = node->next;
     }
-	printf("\n");
+	printf("]");
 }
 
 void performOperationsBasedOnInput(int choice) {
@@ -248,7 +254,7 @@ void performOperationsBasedOnInput(int choice) {
 			break;
 		}
 		default: { 
-			printf("Wrong Input. \nEnter your choice again: ");
+			printf(" W");
 			break;
 		}
 	}

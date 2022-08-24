@@ -5,6 +5,6 @@ typedef struct Node {
 
 typedef struct DoubleLinkedNode {
     int value;
-    struct DoubleLinkedNode * next;
     struct DoubleLinkedNode * prev;
+    struct DoubleLinkedNode * next;
 } DoubleLinkedNode;
