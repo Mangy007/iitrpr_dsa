@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include "Node.c"
 
+void freeMemorySpace();
 void insertAtBeginning(int val);
 void insertAtEnd(int val);
 void deleteFirstNode();
@@ -31,9 +32,21 @@ int main() {
 			scanf("%d",&choice);
 			performOperationsBasedOnInput(choice);
 		}
+		freeMemorySpace();
 	}
 	printf("\n");
 	return 0;
+}
+
+void freeMemorySpace() {
+
+	while (head) {
+		Node *node = head;
+		head = head->next;
+		free(node);
+		node = NULL;
+	}
+	return;
 }
 
 void insertAtBeginning(int val) {
@@ -73,6 +86,7 @@ void deleteFirstNode() {
 	Node *node = head;
 	head = head->next;
 	free(node);
+	node = NULL;	
 }
 
 void deleteLastNode() {
@@ -115,6 +129,7 @@ void deleteSpecificNode(int val) {
 	if(node->value==val) {
 		head = head->next;
 		free(node);
+		node = NULL;
 		return;
 	}
 
@@ -127,6 +142,7 @@ void deleteSpecificNode(int val) {
 		Node *temp = node->next;
 		node->next = node->next->next;
 		free(temp);
+		temp = NULL;
 		return;
 	}
 	printf(" N");
@@ -151,7 +167,7 @@ void findNode(int val) {
 		Node *nodeAddress = node;
 //		printf("\nnode  size: %ld", sizeof(Node));
 //		printf("\nhead: %ld node: %ld", headAddress, nodeAddress);
-		int diff = headAddress-nodeAddress;
+		int diff = nodeAddress-headAddress;
 		printf(" %d(%d)", i, diff);
 	}
 	else {
