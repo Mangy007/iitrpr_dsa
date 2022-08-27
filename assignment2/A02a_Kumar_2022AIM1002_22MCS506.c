@@ -1,6 +1,10 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include "Node.c"
+
+typedef struct Node {
+    int value;
+    struct Node * next;
+} Node;
 
 void freeMemorySpace();
 void insertAtBeginning(int val);
@@ -24,7 +28,7 @@ int main() {
 
 		int entries;
 		scanf("%d", &entries);
-		head = NULL;//(Node*) malloc(sizeof(Node));
+		head = NULL;
 		printf("\n#%d", currentTestcase++);
 		while (entries--)
 		{
@@ -167,7 +171,7 @@ void findNode(int val) {
 		Node *nodeAddress = node;
 //		printf("\nnode  size: %ld", sizeof(Node));
 //		printf("\nhead: %ld node: %ld", headAddress, nodeAddress);
-		int diff = nodeAddress-headAddress;
+		int diff = abs(nodeAddress-headAddress);
 		printf(" %d(%d)", i, diff);
 	}
 	else {
@@ -207,6 +211,10 @@ void printList() {
 void performOperationsBasedOnInput(int choice) {
 
 	switch(choice) {
+		case 0: {
+			freeMemorySpace();
+			exit(0);
+		}
 		case 1: {
 			// insert at beginning
 			int val;
