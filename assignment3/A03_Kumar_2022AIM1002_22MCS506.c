@@ -9,6 +9,28 @@ typedef struct Node {
 
 Node * root = NULL;
 
+void printInorder(Node * node);
+void printPostorder(Node * node);
+void insertIntoBST(int val);
+int numberofLeaves(Node * node);
+
+
+int main() {
+
+    insertIntoBST(4);
+    insertIntoBST(5);
+    insertIntoBST(3);
+    insertIntoBST(6);
+    insertIntoBST(7);
+    insertIntoBST(1);
+    Node * node = root;
+    printInorder(node);
+    printf("\n");
+    printPostorder(node);
+    
+    return 0;
+}
+
 void printInorder(Node * node) {
     if(node==NULL) return;
     printInorder(node->left);
@@ -58,18 +80,8 @@ void insertIntoBST(int val) {
     }
 }
 
-int main() {
-
-    insertIntoBST(4);
-    insertIntoBST(5);
-    insertIntoBST(3);
-    insertIntoBST(6);
-    insertIntoBST(7);
-    insertIntoBST(1);
-    Node * node = root;
-    printInorder(node);
-    printf("\n");
-    printPostorder(node);
-    
-    return 0;
+int numberofLeaves(Node * node) {
+    if(node==NULL) return 0;
+    if(node->left == NULL && node->right == NULL) return 1;
+    return 1 + numberofLeaves(node->left) + numberofLeaves(node->right);
 }
