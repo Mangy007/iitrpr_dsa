@@ -12,7 +12,7 @@ Node * root = NULL;
 void printInorder(Node * node) {
     if(node==NULL) return;
     printInorder(node->left);
-    printf("%d->", node->value);
+    printf("%d ", node->value);
     printInorder(node->right);
 }
 
@@ -20,7 +20,7 @@ void printPostorder(Node * node) {
     if(node==NULL) return;
     printPostorder(node->left);
     printPostorder(node->right);
-    printf("%d->", node->value);
+    printf("%d ", node->value);
 }
 
 void insertIntoBST(int val) {
