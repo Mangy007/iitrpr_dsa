@@ -11,7 +11,7 @@ typedef struct Node {
     int value;
     struct Node * left;
     struct Node * right;
-    int height;
+    // int height;
 } Node;
 
 Node * root = NULL;
@@ -49,69 +49,6 @@ int main() {
         performOperationsBasedOnInput(choice);
     }
 	printf("\n");
-
-    // insertIntoBST(4);
-    // insertIntoBST(3);
-    // insertIntoBST(2);
-    // insertIntoBST(1);
-    // insertIntoBST(12);
-    // insertIntoBST(20);
-    // insertIntoBST(15);
-    // insertIntoBST(13);
-    // insertIntoBST(14);
-    // insertIntoBST(17);
-    // insertIntoBST(25);
-    // insertIntoBST(22);
-    // insertIntoBST(23);
-    // insertIntoBST(8);
-    // insertIntoBST(10);
-    // insertIntoBST(7);
-    // insertIntoBST(6);
-    // insertIntoBST(9);
-    // Node * node = root;
-    // printf("\nNumber of nodes: %d", numberofNodes(node));
-    // printf("\nNumber of leaves: %d", numberofLeaves(node));
-    // printf("\nPreorder: ");
-    // printf("[");
-    // preorder(node);
-    // printf("]");
-    // printf("\nInorder: ");
-    // printf("[");
-    // inorder(node);
-    // printf("]");
-    // printf("\nPostorder: ");
-    // printf("[");
-    // postorder(node);
-    // printf("]");
-    // printf("\nLevelorder: ");
-    // printf("[");
-    // levelOrder(node);
-    // printf("]");
-    // printf("\nHeight of tree: %d", height(node));
-    // printf("\nWidth of tree: %d", width(node));
-    // printf("\nLCA: %d", lowestCommonAncestor(3,11));
-    // printf("\nRoute: ");
-    // route(12,23);
-    // printf("\nRoute: ");
-    // route(6,9);
-    // printf("\nDiameter: %d", diameter(node));
-    // printf("\nPerimeter:");
-    // perimeter(node);
-    // int del = 3;
-    // printf("\nDelete: %d", del);
-    // node = deleteFromBST(node, del);
-    // printf("\nLevelorder: ");
-    // printf("[");
-    // levelOrder(node);
-    // printf("]");
-    // printf("\nPreorder: ");
-    // printf("[");
-    // preorder(node);
-    // printf("]");
-    // printf("\n");
-    // findNode(13);
-    // findNode(21);
-
     
     return 0;
 }
@@ -185,7 +122,6 @@ void levelOrder(Node * node) {
     while (front <= rear) {
         Node * tempNode = queue[front++];
         if(tempNode == NULL) continue;
-        // printf("%d ", rear);
         printf("%d ", tempNode->value);
         if(tempNode->left != NULL) queue[++rear] = tempNode->left;
         if(tempNode->right != NULL) queue[++rear] = tempNode->right;
@@ -195,6 +131,7 @@ void levelOrder(Node * node) {
 Node * createNode(int val) {
     Node * node = (Node *) malloc(sizeof(Node));
     node->value = val;
+    // node->height = 1;
     node->left = NULL;
     node->right = NULL;
     return node;
@@ -203,10 +140,7 @@ Node * createNode(int val) {
 void insertIntoBST(int val) {
     if(val <= 0) return;
     if(root==NULL) {
-        root = (Node *) malloc(sizeof(Node));
-        root->value = val;
-        root->left = NULL;
-        root->right = NULL;
+        root = createNode(val);
     }
     else {
         Node * node = root;
@@ -214,20 +148,14 @@ void insertIntoBST(int val) {
             if(node->value == val) return;
             else if(node->value > val) {
                 if(node->left == NULL) {
-                    Node * newNode = (Node *) malloc(sizeof(Node));
-                    newNode->value = val;
-                    newNode->left = NULL;
-                    newNode->right = NULL;
+                    Node * newNode = createNode(val);
                     node->left = newNode;
                 }
                 node = node->left;
             }
             else {
                 if(node->right == NULL) {
-                    Node * newNode = (Node *) malloc(sizeof(Node));
-                    newNode->value = val;
-                    newNode->left = NULL;
-                    newNode->right = NULL;
+                    Node * newNode = createNode(val);
                     node->right = newNode;
                 }
                 node = node->right;
@@ -255,38 +183,100 @@ Node * deleteFromBST(Node * node, int val) {
     return node;
 }
 
+Node * performLLrotation(Node * node) {
+    Node * currPointer = node;
+    Node * leftPointer = node->left;
+
+    currPointer->left = leftPointer->right;
+    leftPointer->right = currPointer;
+
+    return leftPointer;
+}
+
+Node * performLRrotation(Node * node) {
+    Node * currPointer = node;
+    Node * leftPointer = node->left;
+    Node * leftRightPointer = node->left->right;
+
+    leftPointer->right = leftRightPointer->left;
+    leftRightPointer->left = leftPointer;
+    leftRightPointer->right = currPointer;
+
+    return leftRightPointer;
+}
+
+Node * performRRrotation(Node * node) {
+    Node * currPointer = node;
+    Node * rightPointer = node->right;
+
+    currPointer->right = rightPointer->left;
+    rightPointer->right = currPointer;
+
+    return rightPointer;
+}
+
+Node * performRLrotation(Node * node) {
+    Node * currPointer = node;
+    Node * rightPointer = node->right;
+    Node * rightLeftPointer = node->right->left;
+
+    rightPointer->left = rightLeftPointer->right;
+    rightLeftPointer->right = rightPointer;
+    rightLeftPointer->left = currPointer;
+
+    return rightLeftPointer;
+}
+
 void insertIntoAVL(int val) {
-    if(val <= 0) return;
+    // if(val <= 0) return;
+    Node * node = root;
+    
     if(root==NULL) {
-        root = (Node *) malloc(sizeof(Node));
-        root->value = val;
-        root->left = NULL;
-        root->right = NULL;
+        root = createNode(val);
     }
     else {
-        Node * node = root;
         while(node != NULL) {
-            if(node->value == val) return;
+            if(node->value == val) break;
             else if(node->value > val) {
                 if(node->left == NULL) {
-                    Node * newNode = (Node *) malloc(sizeof(Node));
-                    newNode->value = val;
-                    newNode->left = NULL;
-                    newNode->right = NULL;
+                    Node * newNode = createNode(val);
                     node->left = newNode;
                 }
                 node = node->left;
             }
             else {
                 if(node->right == NULL) {
-                    Node * newNode = (Node *) malloc(sizeof(Node));
-                    newNode->value = val;
-                    newNode->left = NULL;
-                    newNode->right = NULL;
+                    Node * newNode = createNode(val);
                     node->right = newNode;
                 }
                 node = node->right;
             }
+        }
+    }
+    node = root;
+    int N = numberofNodes(node);
+    Node * stack[N];
+    for(int i=0; i<N; i++) stack[i] = NULL;
+    int stackPointer = -1;
+    while(node != NULL) {
+        stack[++stackPointer] = node;
+        if(node->value==val) break;
+        else if(node->value>val) node = node->left;
+        else node = node->right;
+    }
+
+    for (int i = stackPointer-1; i > 0; i--) {
+        Node * tempNode = stack[i];
+        int balanceFactor = height(tempNode->left)-height(tempNode->right);
+        if(balanceFactor>1) {
+            // LL or LR rotation
+            if(tempNode->left->left!=NULL) tempNode =  performLLrotation(tempNode);
+            else tempNode = performLRrotation(tempNode);
+        } 
+        else if(balanceFactor<-1) {
+            // RR or RL rotation
+            if(tempNode->right->right!=NULL) tempNode = performRRrotation(tempNode);
+            else tempNode = performRLrotation(tempNode);
         }
     }
 }
@@ -309,8 +299,36 @@ Node * deleteNode(Node * node, int val) {
    
     return node;
 }
+
 Node * deleteFromAVL(Node * node, int val) {
     node = deleteNode(node, val);
+
+    int N = numberofNodes(node);
+    Node * stack[N];
+    Node * currNode = node;
+    for(int i=0; i<N; i++) stack[i] = NULL;
+    int stackPointer = -1;
+    while(currNode != NULL) {
+        stack[++stackPointer] = currNode;
+        if(currNode->value==val) break;
+        else if(currNode->value>val) currNode = currNode->left;
+        else currNode = currNode->right;
+    }
+
+    for (int i = stackPointer-1; i > 0; i--) {
+        Node * tempNode = stack[i];
+        int balanceFactor = height(tempNode->left)-height(tempNode->right);
+        if(balanceFactor>1) {
+            // LL or LR rotation
+            if(tempNode->left->left!=NULL) tempNode = performLLrotation(tempNode);
+            else tempNode = performLRrotation(tempNode);
+        } 
+        else if(balanceFactor<-1) {
+            // RR or RL rotation
+            if(tempNode->right->right!=NULL) tempNode = performRRrotation(tempNode);
+            else tempNode = performRLrotation(tempNode);
+        }
+    }
 
     return node;
 }
@@ -505,8 +523,8 @@ void perimeter(Node * node) {
 
 void freeTreeIfFilled(Node * node) {
     if(node==NULL) return;
-    postorder(node->left);
-    postorder(node->right);
+    freeTreeIfFilled(node->left);
+    freeTreeIfFilled(node->right);
     free(node);
 }
 
@@ -536,7 +554,6 @@ void performOperationsBasedOnInput(char choice) {
                 scanf("%d", &val);
                 if(val>0) insertIntoAVL(val);
                 else if(val<0) root = deleteFromAVL(root, abs(val));
-                // printf(" %d",val);
             }
 			break;
 		}
