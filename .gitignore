@@ -2,8 +2,6 @@
 .vscode/
 
 # igonore files
-assignment1/R01_Kumar_2022AIM1002_22MCS506.pdf
-assignment1/sortTime.csv
+*/*.csv
 */*.out
 */*.o
-assignment3/A03_Kumar_2022AIM1002_22MCS506
