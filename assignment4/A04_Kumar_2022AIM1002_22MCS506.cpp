@@ -10,14 +10,18 @@ typedef struct Node {
     int key;
     int height;
     double distance;
-    // Node * next;
 } Node;
 
 #define INFINITY __INT_MAX__
 
+vector<vector<Node *>> getGraphRepresentation(int N, int M, int d);
+vector<vector<Node *>> getGraphRepresentationForDAG(int N);
+Node * getMinDistanceNode(bool visit[], set<Node *> sortestPath);
+void findQuickestPathByDijkstra(vector<vector<Node *>> graph, int source, int dest, int N);
+void findQuickestPathByBFS(vector<vector<Node *>> graph, int source, int dest);
+void topologicalSort(vector<vector<Node *>> graph);
+void freeGraph(vector<vector<Node *>> graph);
 void performOperationBasedOnQueryType(int query);
-void findQuickestPathBasedOnM(vector<vector<int>> adjMat, int M, int sx, int sy, int vx, int vy);
-
 
 int main() {
 
@@ -27,6 +31,7 @@ int main() {
         int query;
         cin >> query;
         performOperationBasedOnQueryType(query);
+        cout<<endl;
     }
 
     return 0;
@@ -93,15 +98,31 @@ vector<vector<Node *>> getGraphRepresentation(int N, int M, int d) {
     return adjList;
 }
 
-//test function: might delete later
-void printGraph(vector<vector<Node *>> adjList) {
-
-    for(vector<Node *> node : adjList) {
-        for(Node * elem : node) {
-            cout << elem->key << "(" << elem->height << ") ->";
+vector<vector<Node *>> getGraphRepresentationForDAG(int N) {
+    vector<vector<Node *>> graph;
+    int distances[N][N];
+    for(int i=0;i<N;i++) {
+        for(int j=0;j<N;j++) {
+            cin >> distances[i][j];
         }
-        cout << endl;
     }
+    vector<Node *> nodes;
+    for(int i=0; i<N; i++) { 
+        Node * node = (Node *) malloc(sizeof(Node));
+        node->key = i+1;
+        nodes.push_back(node);
+    }
+
+    for(int i=0;i<N;i++) {
+        vector<Node *> listOfNodes;
+        listOfNodes.push_back(nodes[i]);
+        for(int j=0;j<N;j++) {
+            if(distances[i][j]==1) listOfNodes.push_back(nodes[j]);
+        }
+        graph.push_back(listOfNodes);
+    }
+
+    return graph;
 }
 
 Node * getMinDistanceNode(bool visit[], set<Node *> sortestPath) {
@@ -118,7 +139,6 @@ Node * getMinDistanceNode(bool visit[], set<Node *> sortestPath) {
 }
 
 void findQuickestPathByDijkstra(vector<vector<Node *>> graph, int source, int dest, int N) {
-
     Node * sourceNode = graph[source-1][0];
     Node * destNode = graph[dest-1][0];
     bool visited[graph.size()];
@@ -154,8 +174,8 @@ void findQuickestPathByDijkstra(vector<vector<Node *>> graph, int source, int de
         }
     }
 
-    if(destNode->distance==INFINITY) cout << "-1" << endl;
-    else cout << destNode->distance << endl;
+    if(destNode->distance==INFINITY) cout << "-1";
+    else cout << destNode->distance;
 }
 
 void findQuickestPathByBFS(vector<vector<Node *>> graph, int source, int dest) {
@@ -185,7 +205,38 @@ void findQuickestPathByBFS(vector<vector<Node *>> graph, int source, int dest) {
         }
     }
 
-    cout << destNode->distance << endl;
+    cout << destNode->distance;
+}
+
+void topologicalSort(vector<vector<Node *>> graph) {
+    int N = graph.size();
+    int inDegrees[N];
+    int visitedNode = 0;
+    for(int i=0; i<N; i++) {
+        inDegrees[i] = 0;
+    }
+    for(int i=0; i<N; i++) {
+        for(int j=1; j<graph[i].size();j++)
+            inDegrees[graph[i][j]->key-1] += 1;
+    }
+    priority_queue<int, vector<int>, greater<int>> explored;
+    for(int i=0; i<N; i++) {
+        if(inDegrees[i]==0) explored.push(graph[i][0]->key);
+    }
+    string topologicalSortedSequence = "";
+
+    while (!explored.empty()) {
+        int currNode = explored.top();
+        explored.pop();
+        topologicalSortedSequence += to_string(currNode)+" ";
+        for(Node * node: graph[currNode-1]) {
+            inDegrees[node->key-1]--;
+            if(inDegrees[node->key-1]==0) explored.push(node->key);
+        }
+        visitedNode++;
+    }
+    if(visitedNode!=N) cout<<"-1";
+    else cout<<topologicalSortedSequence.substr(0,topologicalSortedSequence.length()-1);
 }
 
 void freeGraph(vector<vector<Node *>> graph) {
@@ -200,34 +251,35 @@ void performOperationBasedOnQueryType(int query) {
         // sortest path using dijkstra
         int N, M, sx, sy, vx, vy;
         cin >> N >> M >> sx >> sy >> vx >> vy;
-        vector<vector<Node *>> adjList = getGraphRepresentation(N, M, -1);
-        // printGraph(adjList);
+        vector<vector<Node *>> graph = getGraphRepresentation(N, M, -1);
         if(M!=2 && M!=4 && M!=6 && M!=8) {
-            cout << "-1" << endl;
+            cout << "-1";
             break;
         }
         int source = (sx-1)*N + sy;
         int destination = (vx-1)*N + vy;
-        findQuickestPathByDijkstra(adjList, source, destination, N);
-        freeGraph(adjList);
+        findQuickestPathByDijkstra(graph, source, destination, N);
+        freeGraph(graph);
         break;
     }
     case 2: {
         // sortest path using bfs
         int N, d, sx, sy, vx, vy;
         cin >> N >> d >> sx >> sy >> vx >> vy;
-        vector<vector<Node *>> adjList = getGraphRepresentation(N, 4, d);
+        vector<vector<Node *>> graph = getGraphRepresentation(N, 4, d);
         int source = (sx-1)*N + sy;
         int destination = (vx-1)*N + vy;
-        // printGraph(adjList);
-        findQuickestPathByBFS(adjList, source, destination);
+        findQuickestPathByBFS(graph, source, destination);
+        freeGraph(graph);
         break;
     }
     case 3: {
         // topological sort
         int N;
         cin >> N;
-        // vector<vector<int>> adjMat = getGraphRepresentation(N, 0);
+        vector<vector<Node *>> graph = getGraphRepresentationForDAG(N);
+        topologicalSort(graph);
+        freeGraph(graph);
         break;
     }
     default:
