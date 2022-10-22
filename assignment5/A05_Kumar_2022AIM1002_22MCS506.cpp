@@ -7,7 +7,8 @@ using namespace std;
 
 vector<vector<int>> getGraphRepresentation(int N, int M, int source);
 vector<vector<int>> getMST(vector<vector<int>> graph, int source);
-void printMST(vector<vector<int>> mst, int root);
+int getMSTCost(vector<vector<int>> mst);
+void printOutput(vector<vector<int>> mst, int root);
 
 int main() {
 
@@ -18,7 +19,7 @@ int main() {
         cin >> N >> M >> s;
         vector<vector<int>> graph = getGraphRepresentation(N, M, s);
         vector<vector<int>> mst = getMST(graph, s);
-        printMST(mst, s);
+        printOutput(mst, s);
         cout<<endl;
     }
 
@@ -61,33 +62,14 @@ bool sortPairs(const pair<int,int> &a, const pair<int,int> &b)
     return (a.first < b.first);
 }
 
-vector<vector<int>> getMST(vector<vector<int>> graph, int source) {
-    
+vector<vector<int>> createSpanningTree(vector<vector<int>> graph, vector<vector<int>> mst, int root, vector<bool> marked) {
+
     int size = graph.size();
-    bool marked[size];
-    vector<vector<int>> mst(size);
-    for(int i=0;i<size; i++) marked[i] = false;
-    marked[source-1] = true;
-    for(int i=0; i<size; i++) {
-        vector<int> outEdges(size);
-        mst[i] = outEdges;
-    }
-
-    // nodes with only incoming edges are added first
-    for (int i = 0; i < size; i++) {
-        int count = 0;
-        for (int j = 0; j < size; j++) {
-            if(graph[j][i]>0) count++;
-        }
-        if(count==1) {
-            marked[i] = true;
-            for (int j = 0; j < size; j++) mst[j][i] = graph[j][i];
-        }
-    }
 
     for (int i = 0; i < size; i++) {
+        if(i==root-1) continue;
         int min = INF;
-        pair<int, int> index = make_pair(source-1,source-1);
+        pair<int, int> index = make_pair(root-1,root-1);
         // sort by pair can be used
         for (int j = 0; j < size; j++) {
             if(!marked[j] && min>graph[i][j] && graph[i][j]>0 && !isAncestor(mst, i, j, size)) {
@@ -95,7 +77,7 @@ vector<vector<int>> getMST(vector<vector<int>> graph, int source) {
                 index = make_pair(i,j);
             }
         }
-        if(!(index.first==source-1 && index.second==source-1)) {
+        if(!(index.first==root-1 && index.second==root-1)) {
             marked[index.second] = true;
             for (int j = 0; j < size; j++) {
                 if(j==index.first) mst[j][index.second] = graph[index.first][index.second]; 
@@ -111,7 +93,6 @@ vector<vector<int>> getMST(vector<vector<int>> graph, int source) {
                 if(graph[j][i]>0) incomingEdges.push_back(make_pair(graph[j][i], j));
             }
             sort(incomingEdges.begin(), incomingEdges.end());
-            // sort(incomingEdges.begin(), incomingEdges.end(), sortPairs);
             for(int j=0; j<incomingEdges.size(); j++) {
                 int outEdgeVertex = incomingEdges[j].second;
                 if(!isAncestor(mst, outEdgeVertex, i, size)) {
@@ -135,7 +116,7 @@ vector<vector<int>> getMST(vector<vector<int>> graph, int source) {
         bool isIncomingEdgeFromSource = false;
 
         for(int j=0; j < currentMST.size(); j++) {
-            if(currentMST[j].second==i && currentMST[j].first==source-1) {
+            if(currentMST[j].second==i && currentMST[j].first==root-1) {
                 isIncomingEdgeFromSource = true;
                 break;
             }
@@ -175,6 +156,57 @@ vector<vector<int>> getMST(vector<vector<int>> graph, int source) {
     return mst;
 }
 
+vector<vector<int>> getMST(vector<vector<int>> graph, int root) {
+    
+    int size = graph.size();
+    vector<bool> marked(size), sptreeMarked(size);
+    vector<vector<int>> mst(size), sptree(size), tempsptree(size);
+    for(int i=0;i<size; i++) marked[i] = false;
+    marked[root-1] = true;
+    for(int i=0; i<size; i++) {
+        vector<int> outEdges(size);
+        mst[i] = outEdges;
+    }
+
+    // nodes with only incoming edges are added first
+    for (int i = 0; i < size; i++) {
+        int count = 0;
+        for (int j = 0; j < size; j++) {
+            if(graph[j][i]>0) count++;
+        }
+        if(count==1) {
+            marked[i] = true;
+            for (int j = 0; j < size; j++) mst[j][i] = graph[j][i];
+        }
+    }
+    
+    sptree = mst;
+    sptreeMarked = marked;
+    vector<pair<int,int>> rootOutgoingEdges;
+    for(int i = 0; i < size; i++) {
+        if(graph[root-1][i]>0) rootOutgoingEdges.push_back(make_pair(graph[root-1][i], i));
+    }
+    sort(rootOutgoingEdges.begin(), rootOutgoingEdges.end());
+    bool isFirst = true;
+
+    for(pair<int, int> rootedge: rootOutgoingEdges) {
+        sptreeMarked[rootedge.second] = true;
+        sptree[root-1][rootedge.second] = rootedge.first;
+        tempsptree = sptree;
+        sptree = createSpanningTree(graph, sptree, root, sptreeMarked);
+        if(isFirst) {
+            mst = sptree;
+            isFirst = false;
+        }
+        if(getMSTCost(sptree) < getMSTCost(mst)) {
+            mst = sptree;
+        }
+        sptreeMarked = marked;
+        sptree = tempsptree;
+    }
+    return mst;
+}
+
 
 int getCostFromSource(vector<pair<int,int>> mstSourceDestPairs, vector<vector<int>> mst, int source, int dest, int root) {
 
@@ -196,32 +228,22 @@ int getCostFromSource(vector<pair<int,int>> mstSourceDestPairs, vector<vector<in
     return minCostFromSource;
 }
 
-void printMST(vector<vector<int>> mst, int root) {
+int getMSTCost(vector<vector<int>> mst) {
 
     int size = mst.size();
     int minCost = 0;
     for(int i=0; i<size; i++) {
         for (int j = 0; j < size; j++) {
-            // cout << "    " << mst[i][j];
             minCost += mst[i][j];
         }
-        // cout<<endl;
     }
-    cout<< minCost << " ";
+    return minCost;
+}
 
-    vector<pair<int,int>> mstSourceDestPairs;
-    for (int i = 0; i < size; i++) {
-        for(int j = 0; j < size; j++) {
-            if(mst[j][i]>0) mstSourceDestPairs.push_back(make_pair(j, i));
-        }
-    }
-    
+void printCostFromSource(vector<vector<int>> mst, vector<pair<int,int>> mstSourceDestPairs, int root, int size) {
+
     for(int i=0;i<size;i++) {
         int costFromSource = 0;
-        // if(i==root-1) {
-        //     cout << costFromSource << " ";
-        //     continue;
-        // }
         if(isAncestor(mst, i, root-1, size)) {
             for(int j=0; j<mstSourceDestPairs.size(); j++) {
                 if(mstSourceDestPairs[j].second==i) {
@@ -234,12 +256,12 @@ void printMST(vector<vector<int>> mst, int root) {
         else {
             costFromSource = -1;
         }
-        // for(int j=0;j<size;j++) {
-        //     if(mst[j][i]>0) costFromSource = getCostFromSource(mstSourceDestPairs, mst, j, i, source);
-        // }
         cout << costFromSource << " "; 
     }
-    cout << "# ";
+}
+
+void printParent(vector<vector<int>> mst, vector<pair<int,int>> mstSourceDestPairs, int root, int size) {
+
     for(int i=0;i<size;i++) {
         if(i==root-1) {
             cout << "0 ";
@@ -254,4 +276,22 @@ void printMST(vector<vector<int>> mst, int root) {
             cout << "-1 ";
         }
     }
+}
+
+void printOutput(vector<vector<int>> mst, int root) {
+
+    int size = mst.size();
+    int minCost = getMSTCost(mst);
+    cout<< minCost << " ";
+
+    vector<pair<int,int>> mstSourceDestPairs;
+    for (int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
+            if(mst[j][i]>0) mstSourceDestPairs.push_back(make_pair(j, i));
+        }
+    }
+
+    printCostFromSource(mst, mstSourceDestPairs, root, size);
+    cout << "# ";
+    printParent(mst, mstSourceDestPairs, root, size);
 }
